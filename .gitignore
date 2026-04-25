@@ -1,0 +1,45 @@
+# Gradle files
+.gradle/
+build/
+
+# Android Studio / IntelliJ files
+.idea/
+*.iml
+*.ipr
+*.iws
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/gradle.xml
+.idea/assetWizardSettings.xml
+.idea/dictionaries/
+.idea/libraries/
+.idea/caches/
+.idea/modules.xml
+.idea/navEditor.xml
+
+# Local properties (contains SDK path)
+local.properties
+
+# Secrets
+*.jks
+*.keystore
+
+# Built variants
+/captures
+.externalNativeBuild
+.cxx
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Misc
+*.log
+index.html
+styles.css
+script.js
+*.xml
+!.idea/
+!app/src/main/res/
+!app/src/main/AndroidManifest.xml
+!app/src/main/res/xml/accessibility_config.xml
