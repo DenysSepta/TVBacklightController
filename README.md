@@ -1,4 +1,4 @@
-# TV Backlight Controller
+# Simple TV Backlight Controller
 
 An Android TV utility that allows you to control your TV's backlight level using the **Channel Up** and **Channel Down** buttons on your remote. It features a custom overlay to show the current backlight level and supports "hold to repeat" for quick adjustments.
 
