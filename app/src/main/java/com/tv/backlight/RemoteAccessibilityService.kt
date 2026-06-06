@@ -1,7 +1,10 @@
 package com.tv.backlight
 
 import android.accessibilityservice.AccessibilityService
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.graphics.PixelFormat
 import android.os.Handler
 import android.os.Looper
@@ -21,7 +24,7 @@ class RemoteAccessibilityService : AccessibilityService() {
     private var overlayView: View? = null
     private val handler = Handler(Looper.getMainLooper())
     private val hideRunnable = Runnable { hideOverlay() }
-    
+
     private var repeatingKey: Int? = null
     private val repeatRunnable = object : Runnable {
         override fun run() {
@@ -32,10 +35,43 @@ class RemoteAccessibilityService : AccessibilityService() {
         }
     }
 
+
+    private val screenStateReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            when (intent.action) {
+                Intent.ACTION_SCREEN_OFF -> {
+                    Log.d("TVBACKLIGHT", "Screen OFF - System goes to sleep")
+                    // 1. Прячем интерфейс и останавливаем залипание кнопок
+                    hideOverlay()
+                    repeatingKey = null
+                    handler.removeCallbacksAndMessages(null)
+
+                    // 2. Останавливаем основной сервис (именно он зажигает лампочку)
+                    val serviceIntent = Intent(context, BacklightService::class.java)
+                    context.stopService(serviceIntent)
+                }
+                Intent.ACTION_SCREEN_ON -> {
+                    Log.d("TVBACKLIGHT", "Screen ON - System wakes up")
+                    // Перезапускаем сервис подсветки, когда экран включился
+                    val serviceIntent = Intent(context, BacklightService::class.java)
+                    // Используем startForegroundService, так как это требует система для Android 8+
+                    context.startForegroundService(serviceIntent)
+                }
+            }
+        }
+    }
+
     override fun onServiceConnected() {
         super.onServiceConnected()
         windowManager = getSystemService(Context.WINDOW_SERVICE) as WindowManager
         Log.d("TVBACKLIGHT", "Accessibility connected")
+
+        // ДОБАВЛЕНО: Регистрируем ресивер при старте AccessibilityService
+        val filter = IntentFilter().apply {
+            addAction(Intent.ACTION_SCREEN_OFF)
+            addAction(Intent.ACTION_SCREEN_ON)
+        }
+        registerReceiver(screenStateReceiver, filter)
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {}
@@ -74,11 +110,11 @@ class RemoteAccessibilityService : AccessibilityService() {
 
     private fun showOverlay() {
         handler.removeCallbacks(hideRunnable)
-        
+
         if (overlayView == null) {
             val inflater = LayoutInflater.from(this)
             overlayView = inflater.inflate(R.layout.backlight_overlay, null)
-            
+
             val params = WindowManager.LayoutParams(
                 WindowManager.LayoutParams.WRAP_CONTENT,
                 WindowManager.LayoutParams.WRAP_CONTENT,
@@ -114,5 +150,11 @@ class RemoteAccessibilityService : AccessibilityService() {
         super.onDestroy()
         hideOverlay()
         handler.removeCallbacksAndMessages(null)
+
+        try {
+            unregisterReceiver(screenStateReceiver)
+        } catch (e: Exception) {
+            Log.e("TVBACKLIGHT", "Receiver not registered", e)
+        }
     }
 }
