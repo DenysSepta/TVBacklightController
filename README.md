@@ -49,11 +49,6 @@ Press a button to change the level by **5%**, or hold it for continuous adjustme
           backlight level
 ```
 
-## 📸 Screenshots
-
-_Add screenshots or a short GIF here showing the remote button being pressed and the backlight overlay appearing._
-
-A short GIF is particularly useful for demonstrating the app on the GitHub project page.
 
 ## 📦 Installation
 
