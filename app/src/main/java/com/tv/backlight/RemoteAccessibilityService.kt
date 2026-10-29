@@ -41,20 +41,20 @@ class RemoteAccessibilityService : AccessibilityService() {
             when (intent.action) {
                 Intent.ACTION_SCREEN_OFF -> {
                     Log.d("TVBACKLIGHT", "Screen OFF - System goes to sleep")
-                    // 1. Прячем интерфейс и останавливаем залипание кнопок
+                    // 1. Hide the overlay and stop any repeating key action.
                     hideOverlay()
                     repeatingKey = null
                     handler.removeCallbacksAndMessages(null)
 
-                    // 2. Останавливаем основной сервис (именно он зажигает лампочку)
+                    // 2. Stop the main foreground service.
                     val serviceIntent = Intent(context, BacklightService::class.java)
                     context.stopService(serviceIntent)
                 }
                 Intent.ACTION_SCREEN_ON -> {
                     Log.d("TVBACKLIGHT", "Screen ON - System wakes up")
-                    // Перезапускаем сервис подсветки, когда экран включился
+                    // Restart the backlight service when the screen turns on.
                     val serviceIntent = Intent(context, BacklightService::class.java)
-                    // Используем startForegroundService, так как это требует система для Android 8+
+                    // Android 8.0 and later require startForegroundService for this service.
                     context.startForegroundService(serviceIntent)
                 }
             }
@@ -66,7 +66,7 @@ class RemoteAccessibilityService : AccessibilityService() {
         windowManager = getSystemService(Context.WINDOW_SERVICE) as WindowManager
         Log.d("TVBACKLIGHT", "Accessibility connected")
 
-        // ДОБАВЛЕНО: Регистрируем ресивер при старте AccessibilityService
+        // Register the screen-state receiver when the Accessibility service connects.
         val filter = IntentFilter().apply {
             addAction(Intent.ACTION_SCREEN_OFF)
             addAction(Intent.ACTION_SCREEN_ON)
