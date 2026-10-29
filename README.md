@@ -1,200 +1,172 @@
-# 📺 TV Backlight Controller
+# TV Backlight Controller for Android TV
 
-**Control your Android TV's backlight directly from your remote.**
+**Adjust your Android TV's backlight directly from the remote—without navigating picture settings.**
 
-TV Backlight Controller lets you use the **Channel Up** and **Channel Down** buttons on your remote to adjust your TV's backlight without opening the picture settings menu.
+TV Backlight Controller is a lightweight Android TV app that maps **Channel Up** and **Channel Down** on a compatible remote to backlight adjustments. Each press changes the requested level by 5%; holding a button repeats the adjustment. A temporary on-screen indicator displays the level tracked by the app.
 
-Press a button to change the level by **5%**, or hold it for continuous adjustment. A lightweight on-screen indicator shows the current backlight level.
+The project was developed and tested by its maintainer on a **Xiaomi Android TV**. Other TV models and firmware versions are not yet confirmed.
 
-> 💡 Built for Android TV users who want fast, physical remote control over their TV's backlight.
-
-[![Android TV](https://img.shields.io/badge/Android%20TV-21%2B-green?logo=android)](https://www.android.com/tv/)
+[![Android TV](https://img.shields.io/badge/Android%20TV-Android%2010%2B-green?logo=android)](https://www.android.com/tv/)
 [![Kotlin](https://img.shields.io/badge/Kotlin-2.x-purple?logo=kotlin)](https://kotlinlang.org/)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-⭐ **If you find this project useful, consider giving it a Star!**
+## Features
 
-## ✨ Features
+- **Remote backlight control:** Channel Up increases and Channel Down decreases the level.
+- **Press-and-hold adjustment:** Repeats while a button is held.
+- **On-screen level indicator:** Shows the value tracked by the app.
+- **Automatic overlay dismissal:** The indicator hides after about 3 seconds.
+- **Background service:** Keeps the service available while the TV is running.
+- **Boot handling:** Attempts to start the service after the TV boots.
+- **Android TV interface:** Designed for a TV remote and D-pad-based navigation.
 
-- 🎮 **Remote control** — Channel Up/Down control the backlight.
-- ⚡ **Hold to repeat** — Hold a button for rapid continuous adjustment.
-- 📊 **On-screen indicator** — Shows the current backlight level with a progress bar.
-- ⏱️ **Auto-hide** — The overlay disappears automatically after 3 seconds.
-- 🚀 **Boot persistence** — Starts automatically when the TV boots.
-- 🪶 **Lightweight** — Designed to stay out of your way while running in the background.
+## Compatibility and limitations
 
-## 🎬 How It Works
+- **Maintainer-tested:** Xiaomi Android TV (specific model/firmware not yet listed).
+- **Minimum Android version:** Android 10 / API 29, as configured by the app.
+- **Not guaranteed:** Other Xiaomi models, Google TV devices, and TVs from other manufacturers.
 
-```text
-          Android TV Remote
-                 │
-        ┌────────┴────────┐
-        ▼                 ▼
-   Channel Up        Channel Down
-        │                 │
-        └────────┬────────┘
-                 ▼
-       AccessibilityService
-                 │
-                 ▼
-        Change backlight
-                 │
-        ┌────────┴────────┐
-        ▼                 ▼
-   System setting      UI Overlay
-        │                 │
-        └────────┬────────┘
-                 ▼
-          Updated TV
-          backlight level
-```
+Android TV vendors can change their settings provider, supported key events, and backlight implementation. This app writes to Android's global `picture_backlight` setting; a TV must actually honor that setting for the backlight to change. Some TVs may ignore it or use a vendor-specific control.
 
+The on-screen percentage is the value tracked by this app, not a hardware brightness measurement. It starts at 50% when the process initializes and changes in 5% steps; it is not currently read back from the TV's actual panel state. If the display already has a different backlight setting, the indicator may not match it until you adjust it.
 
-## 📦 Installation
+## Installation
 
-### 1. Build the APK
+### Requirements
 
-Clone the repository:
+- Android Studio with the Android SDK.
+- JDK compatible with the Gradle version configured in this repository.
+- An Android TV device running Android 10 (API 29) or later.
+- ADB access for installing the APK and granting the required permission.
+- A remote whose Channel Up/Down events are exposed to Android's Accessibility service.
+
+### 1. Clone the repository
 
 ```bash
 git clone https://github.com/DenysSepta/TVBacklightController.git
 cd TVBacklightController
 ```
 
-Open the project in Android Studio and build the APK.
+Open the project in Android Studio, allow Gradle sync to finish, and build the `app` module.
 
-Or build it from the command line:
+Or build a debug APK from the command line:
 
 ```bash
 ./gradlew assembleDebug
 ```
 
-### 2. Install on your Android TV
+On Windows, use:
 
-Connect to the TV using ADB and install the APK:
+```powershell
+.\gradlew.bat assembleDebug
+```
+
+The debug APK is normally generated at `app/build/outputs/apk/debug/app-debug.apk`.
+
+### 2. Connect to the TV and install
+
+Enable ADB / Developer options on the TV and connect to it from your computer. Replace `TV_IP` with the TV's address:
 
 ```bash
+adb connect TV_IP:5555
 adb install app/build/outputs/apk/debug/app-debug.apk
 ```
 
-### 3. Grant `WRITE_SECURE_SETTINGS`
+If ADB is already paired or connected, use the connection method supported by your TV.
 
-The app needs access to modify the Android TV backlight setting. Grant the privileged permission using ADB:
+### 3. Grant the required system permission
+
+The app writes the `picture_backlight` global setting and requires `WRITE_SECURE_SETTINGS`. Grant it through ADB:
 
 ```bash
 adb shell pm grant com.tv.backlight android.permission.WRITE_SECURE_SETTINGS
 ```
 
-> ⚠️ `WRITE_SECURE_SETTINGS` is a privileged Android permission and normally cannot be granted through the regular TV settings UI.
+This permission is privileged and normally cannot be granted from the standard Android TV settings interface.
 
-### 4. Enable the Accessibility Service
+### 4. Enable the Accessibility service
 
-On the TV, open:
+On the TV, open the Accessibility settings and enable **TV Backlight**. The exact menu path varies by TV firmware; on the tested setup it is under:
 
-**Settings → Device Preferences → Accessibility → TV Backlight → ON**
+**Settings → Device Preferences → Accessibility → TV Backlight**
 
-The Accessibility Service allows the app to receive remote key events while other applications are running.
+The service needs key-event filtering so the app can react to Channel Up/Down while other apps are open.
 
-## 🎮 Usage
+## Usage
 
 | Remote action | Result |
 |---|---|
-| **Channel Up** | Increase backlight by 5% |
-| **Channel Down** | Decrease backlight by 5% |
-| **Hold Channel Up** | Continuously increase backlight |
-| **Hold Channel Down** | Continuously decrease backlight |
+| Press Channel Up | Increase the tracked level by 5% |
+| Press Channel Down | Decrease the tracked level by 5% |
+| Hold Channel Up | Continue increasing after the initial repeat delay |
+| Hold Channel Down | Continue decreasing after the initial repeat delay |
 
-The overlay automatically disappears after approximately **3 seconds**.
+The tracked value is clamped between 0% and 100%. The overlay appears while adjusting and hides automatically after approximately 3 seconds.
 
-## 📺 Compatibility
+## How it works
 
-The app has been tested on a **Xiaomi Android TV** and works with the tested Xiaomi TV configuration.
+1. Android's `AccessibilityService` receives Channel Up/Down key events.
+2. The app adjusts its in-memory level in 5% increments.
+3. It attempts to write that value to `Settings.Global` under `picture_backlight`.
+4. A `TYPE_ACCESSIBILITY_OVERLAY` displays the tracked value.
+5. A foreground service is started on boot and when the screen turns on, subject to Android and vendor background-service restrictions.
 
-> **Xiaomi TV users:** If you have a modern Xiaomi Android TV and the app works for you, please consider reporting your TV model in an Issue or Pull Request so the compatibility list can be expanded.
+The project does not capture the screen or use a camera. It changes a system setting rather than analyzing video to create ambient lighting.
 
-Android TV manufacturers can customize system settings and remote-control behavior, so compatibility may vary between models and firmware versions.
+## Troubleshooting
 
-Known/tested:
+### The buttons do nothing
 
-| Manufacturer | Device | Result |
-|---|---|---|
-| **Xiaomi** | Android TV | ✅ Tested |
+- Confirm **TV Backlight** is enabled under Accessibility.
+- Check whether your remote exposes Channel Up/Down as standard Android key events. Some remotes or TV launchers reserve these buttons.
+- Connect ADB and inspect logs:
 
-If it doesn't work on your TV, please open an Issue with:
+  ```bash
+  adb logcat -s TVBACKLIGHT
+  ```
 
-- TV manufacturer and model
-- Android TV / Google TV version
-- What happens when pressing Channel Up/Down
-- Relevant ADB logs, if available
+  Look for key-code messages when pressing the buttons.
 
-## 🔧 Technical Details
+### The overlay changes, but the physical backlight does not
 
-### AccessibilityService
+- Confirm the permission was granted:
 
-The app uses `AccessibilityService` to receive remote key events system-wide, allowing Channel Up/Down to work while the user is inside other applications.
+  ```bash
+  adb shell pm grant com.tv.backlight android.permission.WRITE_SECURE_SETTINGS
+  ```
 
-### WindowManager
+- Inspect logs for a failed `Settings.Global.putInt` call.
+- The TV firmware may ignore `picture_backlight` or control the panel through a vendor-specific mechanism. This project does not currently include vendor-specific implementations.
 
-The current backlight level is displayed using a custom overlay based on:
+### The displayed percentage does not match the TV
 
-```text
-TYPE_ACCESSIBILITY_OVERLAY
-```
+The app currently initializes its own tracked value at 50%; it does not read the current value back from the TV before adjusting. This is a known limitation. If you can reproduce behavior on another model, please report it with the TV model and firmware details.
 
-### Backlight control
+### The service stops after sleep or reboot
 
-The application modifies the Android system's:
+Android TV firmware may restrict background services. Confirm Accessibility remains enabled and reopen the app once after installation. If the issue persists, include your TV model, Android version, and relevant `TVBACKLIGHT` log lines in a report.
 
-```text
-picture_backlight
-```
+## Privacy and permissions
 
-global setting to change the TV's backlight level.
+- The app uses an Accessibility service to observe remote key events.
+- It requests `WRITE_SECURE_SETTINGS` to update the global backlight setting.
+- It does not need an account or cloud service for its core behavior.
+- ADB should only be enabled and exposed on trusted networks. Disable wireless debugging when it is no longer needed.
 
-## 🛠️ Build Requirements
+## Report a bug or contribute
 
-- **Android Studio Ladybug** or newer
-- **Android SDK 21+**
-- **Kotlin 2.x**
-- Android TV device with a compatible backlight implementation
-- ADB access for initial setup
+Compatibility reports are especially useful because Android TV manufacturers implement system settings and remote controls differently.
 
-## 🤝 Contributing
+Before opening an issue, include:
 
-Contributions are welcome!
+- TV manufacturer and exact model.
+- Android TV / Google TV version and firmware build, if available.
+- Whether the Accessibility service is enabled.
+- Whether the overlay changes when pressing Channel Up/Down.
+- Relevant `adb logcat -s TVBACKLIGHT` output.
 
-If you have an Android TV that behaves differently, you can help improve compatibility:
+Remove private information from logs before posting them publicly. See [CONTRIBUTING.md](CONTRIBUTING.md) for guidance on bug reports and pull requests.
 
-1. Fork the repository.
-2. Create a feature branch.
-3. Make your changes.
-4. Test them on your TV.
-5. Open a Pull Request.
+## License
 
-Bug reports and compatibility reports are also valuable. Please include your TV model and Android TV version whenever possible.
-
-## 💡 Why?
-
-Adjusting a TV's backlight often means navigating through several picture settings menus.
-
-With TV Backlight Controller:
-
-**Press a button. Done.**
-
-The goal is to make a common adjustment as fast and convenient as possible.
-
-## ⭐ Support the Project
-
-If this project is useful to you:
-
-- ⭐ **Star the repository**
-- 🐛 Report bugs
-- 📺 Share your TV model and compatibility results
-- 🔧 Submit improvements
-- 📢 Share the project with other Android TV users
-
-Every star and contribution helps the project reach more Android TV users.
-
-## 📄 License
-
-This project is licensed under the [MIT License](LICENSE).
+This project is released under the [MIT License](LICENSE).
