@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TV Backlight Controller — A better picture, one click away</title>
+  <meta name="description" content="An open-source Android TV utility that adjusts display backlight from a compatible remote, without navigating picture settings.">
+  <meta name="robots" content="index,follow">
+  <link rel="canonical" href="https://denyssepta.github.io/TVBacklightController/">
+  <meta name="theme-color" content="#101317">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="TV Backlight Controller">
+  <meta property="og:description" content="Adjust your Android TV's backlight from the remote. No menus, no detours.">
+  <meta property="og:url" content="https://denyssepta.github.io/TVBacklightController/">
+  <style>
+    :root{color-scheme:dark;--bg:#101317;--surface:#171c21;--surface2:#20262d;--ink:#f1f0e9;--muted:#a2a8ad;--line:#343b42;--amber:#ffbd59;--cyan:#8ed8d2;--sans:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;--mono:"SFMono-Regular",Consolas,"Liberation Mono",monospace}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.65 var(--sans);-webkit-font-smoothing:antialiased}a{color:inherit}.wrap{width:min(1140px,calc(100% - 48px));margin:auto}
+    .nav{height:78px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line)}.brand{display:flex;align-items:center;gap:12px;text-decoration:none;font-weight:750;letter-spacing:-.03em;font-size:.93rem}.brand-mark{width:30px;height:30px;border:1px solid var(--amber);display:grid;place-items:center;color:var(--amber);font-size:15px;font-weight:800}.navlinks{display:flex;align-items:center;gap:27px;font-size:.82rem;color:var(--muted);font-weight:650}.navlinks a{text-decoration:none}.navlinks a:hover{color:var(--ink)}.navlinks .repo{padding:9px 13px;border:1px solid #62686d;color:var(--ink)}
+    .hero{padding:88px 0 74px;display:grid;grid-template-columns:1.05fr .95fr;gap:74px;align-items:center}.kicker{font:700 .7rem/1.5 var(--mono);letter-spacing:.13em;text-transform:uppercase;color:var(--cyan);display:flex;align-items:center;gap:10px}.kicker:before{content:"";width:25px;height:1px;background:var(--cyan)}h1{font-size:clamp(3.25rem,7.2vw,6.2rem);line-height:.96;letter-spacing:-.085em;margin:23px 0 24px;font-weight:760}h1 span{color:var(--amber)}.lead{max-width:550px;color:#b7bdc0;font-size:1.12rem;line-height:1.75}.actions{display:flex;flex-wrap:wrap;gap:11px;margin-top:31px}.btn{min-height:47px;display:inline-flex;align-items:center;gap:12px;padding:0 16px;border:1px solid #60666b;text-decoration:none;font-size:.84rem;font-weight:750;transition:transform .16s ease,border-color .16s ease}.btn:hover{transform:translateY(-2px);border-color:var(--amber)}.btn.primary{background:var(--amber);border-color:var(--amber);color:#1b1a16}.arrow{font-size:1.1rem}
+    .device-stage{position:relative;padding:25px 0 25px 12px}.device-stage:before{content:"";position:absolute;inset:0 15px 0 0;background:radial-gradient(ellipse at 52% 43%,rgba(142,216,210,.13),transparent 62%);pointer-events:none}.tv{position:relative;border:1px solid #596168;background:#07090b;padding:9px;box-shadow:0 24px 70px #0008}.screen{min-height:285px;position:relative;overflow:hidden;background:linear-gradient(140deg,#1b393d 0%,#253d42 36%,#c2783b 100%);display:flex;align-items:center;justify-content:center}.screen:before,.screen:after{content:"";position:absolute;border-radius:50%;filter:blur(2px)}.screen:before{width:260px;height:260px;left:-55px;top:-70px;background:linear-gradient(140deg,#7dc4b6,#37666a);opacity:.8}.screen:after{width:300px;height:300px;right:-65px;bottom:-160px;background:#f2b16a;opacity:.85}.screen-art{position:absolute;inset:0;background:linear-gradient(115deg,transparent 35%,#111a1c35 35.2%,transparent 63%);z-index:1}.osd{position:relative;z-index:2;width:min(78%,280px);padding:18px 19px;background:#101317df;border:1px solid #ffffff30;backdrop-filter:blur(12px)}.osd-top{display:flex;justify-content:space-between;align-items:center;font-size:.69rem;color:#d7d9d6}.osd-top span:last-child{font-family:var(--mono);color:var(--amber)}.bar{height:4px;background:#ffffff38;margin:15px 0 10px;position:relative}.bar i{display:block;width:65%;height:100%;background:var(--amber)}.osd-foot{display:flex;justify-content:space-between;align-items:center;font:11px/1.4 var(--mono);color:#c2c6c5}.tv-stand{height:8px;width:19%;margin:auto;background:#454c51;position:relative}.tv-stand:after{content:"";position:absolute;left:-38%;right:-38%;bottom:-4px;height:4px;background:#454c51}.device-caption{position:relative;display:flex;justify-content:space-between;gap:15px;margin-top:18px;font:10px/1.5 var(--mono);letter-spacing:.05em;text-transform:uppercase;color:#8e969a}
+    .quickfacts{display:grid;grid-template-columns:repeat(3,1fr);border-block:1px solid var(--line)}.fact{padding:22px 22px 23px 0}.fact+.fact{border-left:1px solid var(--line);padding-left:24px}.fact strong{display:block;font-size:1rem;letter-spacing:-.025em}.fact span{display:block;color:var(--muted);font-size:.78rem;margin-top:3px}
+    section.section{padding:83px 0}.section-head{display:grid;grid-template-columns:.9fr 1.1fr;gap:65px;align-items:start;margin-bottom:37px}.section-label{font:700 .68rem/1.5 var(--mono);letter-spacing:.13em;text-transform:uppercase;color:var(--amber)}h2{font-size:clamp(2.2rem,4.6vw,3.8rem);line-height:1.02;letter-spacing:-.07em;margin:13px 0 0}.section-intro{max-width:560px;margin:12px 0 0;color:var(--muted)}.steps{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid #737a7e}.step{padding:21px 25px 10px 0}.step+.step{padding-left:24px;border-left:1px solid var(--line)}.step-num{font:11px/1.4 var(--mono);color:var(--cyan)}.step h3{margin:28px 0 8px;font-size:1.12rem;letter-spacing:-.03em}.step p{margin:0;color:var(--muted);font-size:.9rem}
+    .feature-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.feature{background:var(--surface);padding:25px 27px;border:1px solid #252c32;min-height:165px}.feature-top{display:flex;align-items:center;gap:10px;color:var(--cyan);font:11px/1.5 var(--mono);text-transform:uppercase;letter-spacing:.08em}.feature h3{font-size:1.14rem;letter-spacing:-.035em;margin:19px 0 7px}.feature p{font-size:.88rem;color:var(--muted);margin:0}
+    .warning{display:grid;grid-template-columns:160px 1fr;gap:25px;padding:24px 0;border-block:1px solid var(--line);margin-top:28px}.warning strong{font:700 .68rem/1.5 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--amber)}.warning p{margin:0;color:var(--muted);font-size:.88rem}
+    .install{display:grid;grid-template-columns:.8fr 1.2fr;gap:65px;background:var(--surface);border:1px solid var(--line);padding:38px}.install h2{font-size:clamp(2rem,3.5vw,3rem)}.install p{color:var(--muted);font-size:.9rem}.code{padding:20px;background:#0c0f12;border:1px solid #30363c;font:12px/1.9 var(--mono);color:#d7dbd6;overflow-wrap:anywhere}.code .comment{color:#7c898e}.code .cmd{color:var(--amber)}.install-links{display:flex;gap:17px;flex-wrap:wrap;margin-top:20px;font-size:.83rem;font-weight:700}.install-links a{text-underline-offset:4px}
+    .footer{padding:24px 0 32px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:20px;color:var(--muted);font-size:.78rem}.footer p{margin:0}.footer-links{display:flex;gap:19px;flex-wrap:wrap}.footer a{text-decoration:none}.footer a:hover{color:var(--ink)}
+    @media(max-width:800px){.hero{grid-template-columns:1fr;gap:37px;padding:60px 0}.device-stage{max-width:600px}.section-head,.install{grid-template-columns:1fr;gap:23px}.steps{grid-template-columns:1fr}.step,.step+.step{padding:20px 0;border-left:0;border-top:1px solid var(--line)}.step h3{margin-top:13px}.warning{grid-template-columns:1fr;gap:8px}.install{padding:26px}.quickfacts{grid-template-columns:1fr}.fact,.fact+.fact{padding:14px 0;border-left:0}.fact+.fact{border-top:1px solid var(--line)}}@media(max-width:520px){.wrap{width:calc(100% - 32px)}.nav{height:66px}.navlinks{gap:13px;font-size:.74rem}.navlinks a:first-child{display:none}.hero{padding-top:47px}h1{font-size:clamp(3.1rem,15.5vw,4.6rem)}.screen{min-height:230px}.osd{width:82%}.section{padding:57px 0!important}.feature-grid{grid-template-columns:1fr}.feature{min-height:0}.footer{flex-direction:column}}@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.btn{transition:none}}
+  </style>
+</head>
+<body>
+  <header class="wrap nav">
+    <a class="brand" href="./"><span class="brand-mark">B/</span><span>TV Backlight Controller</span></a>
+    <nav class="navlinks" aria-label="Main navigation"><a href="#how-it-works">How it works</a><a href="#compatibility">Compatibility</a><a class="repo" href="https://github.com/DenysSepta/TVBacklightController">View source ↗</a></nav>
+  </header>
+  <main class="wrap">
+    <section class="hero">
+      <div>
+        <div class="kicker">A small Android TV utility</div>
+        <h1>Picture settings.<br><span>Out of the way.</span></h1>
+        <p class="lead">Change your TV's backlight straight from a compatible remote. Channel Up to brighten. Channel Down to dim. No detour through settings menus.</p>
+        <div class="actions"><a class="btn primary" href="https://github.com/DenysSepta/TVBacklightController#installation">Get started <span class="arrow">↗</span></a><a class="btn" href="https://github.com/DenysSepta/TVBacklightController">Browse source <span class="arrow">→</span></a></div>
+      </div>
+      <div class="device-stage" aria-label="Illustration of an on-screen backlight level indicator">
+        <div class="tv"><div class="screen"><div class="screen-art"></div><div class="osd"><div class="osd-top"><span>BACKLIGHT LEVEL</span><span>65%</span></div><div class="bar"><i></i></div><div class="osd-foot"><span>− DIM</span><span>+ BRIGHT</span></div></div></div></div><div class="tv-stand"></div>
+        <div class="device-caption"><span>Remote input → instant adjustment</span><span>OSD / 03 SEC</span></div>
+      </div>
+    </section>
+    <div class="quickfacts"><div class="fact"><strong>Android 10+</strong><span>Minimum supported API level 29</span></div><div class="fact"><strong>5% per press</strong><span>Press and hold to repeat adjustment</span></div><div class="fact"><strong>MIT licensed</strong><span>Open source · Kotlin</span></div></div>
+    <section class="section" id="how-it-works">
+      <div class="section-head"><div><div class="section-label">01 — Interaction</div><h2>Two buttons.<br>One less menu.</h2></div><p class="section-intro">The app listens for remote key events through Android's Accessibility service, adjusts its tracked level in small steps, and shows a temporary overlay while you make the change.</p></div>
+      <div class="steps">
+        <article class="step"><div class="step-num">INPUT / 01</div><h3>Press Channel Up or Down</h3><p>Use a compatible remote while watching content or navigating other apps on the TV.</p></article>
+        <article class="step"><div class="step-num">CONTROL / 02</div><h3>Adjust in 5% steps</h3><p>A press changes the app's tracked level; holding the button repeats the adjustment. The value stays within 0–100%.</p></article>
+        <article class="step"><div class="step-num">FEEDBACK / 03</div><h3>See the temporary overlay</h3><p>The on-screen indicator shows the value tracked by the app and disappears after about three seconds.</p></article>
+      </div>
+    </section>
+    <section class="section" id="compatibility">
+      <div class="section-head"><div><div class="section-label">02 — Under the hood</div><h2>Lightweight by design.<br>Honest about limits.</h2></div><p class="section-intro">The project writes Android's global <code>picture_backlight</code> setting. It doesn't capture video, analyze the image, or generate ambient lighting. Whether the panel responds depends on the TV's firmware.</p></div>
+      <div class="feature-grid">
+        <article class="feature"><div class="feature-top">↗ &nbsp; Remote integration</div><h3>Accessibility key events</h3><p>Uses Android's Accessibility service to detect Channel Up/Down events when the TV exposes them to the service.</p></article>
+        <article class="feature"><div class="feature-top">↗ &nbsp; System setting</div><h3>Global backlight value</h3><p>Requires the privileged <code>WRITE_SECURE_SETTINGS</code> permission, granted through ADB during setup.</p></article>
+        <article class="feature"><div class="feature-top">↗ &nbsp; Persistent service</div><h3>Boot and screen handling</h3><p>Attempts to start its service on boot and when the screen turns on, subject to firmware background-service restrictions.</p></article>
+        <article class="feature"><div class="feature-top">↗ &nbsp; On-screen feedback</div><h3>Temporary level indicator</h3><p>Displays the app's tracked percentage in an accessibility overlay. The indicator is not a hardware brightness measurement.</p></article>
+      </div>
+      <div class="warning"><strong>Compatibility note</strong><p>Tested by the maintainer on a Xiaomi Android TV; other models and firmware are not yet confirmed. The app starts its internal value at 50% rather than reading the panel's current setting, and some TVs may ignore <code>picture_backlight</code> or use vendor-specific controls.</p></div>
+    </section>
+    <section class="section">
+      <div class="install">
+        <div><div class="section-label">03 — Quick start</div><h2>Build it.<br>Install it.<br>Grant access.</h2><p>Build the Android app, install it over ADB, grant the required system permission, then enable the TV Backlight Accessibility service on the device.</p><div class="install-links"><a href="https://github.com/DenysSepta/TVBacklightController#installation">Full installation guide ↗</a><a href="https://github.com/DenysSepta/TVBacklightController/blob/main/README.md#troubleshooting">Troubleshooting ↗</a></div></div>
+        <div class="code"><div class="comment"># Build the debug APK</div><div class="cmd">./gradlew assembleDebug</div><br><div class="comment"># Connect and install (replace TV_IP)</div><div class="cmd">adb connect TV_IP:5555</div><div class="cmd">adb install app/build/outputs/apk/debug/app-debug.apk</div><br><div class="comment"># Grant permission required for backlight writes</div><div class="cmd">adb shell pm grant com.tv.backlight android.permission.WRITE_SECURE_SETTINGS</div></div>
+      </div>
+    </section>
+  </main>
+  <footer class="wrap footer"><p>Maintained by <a href="https://github.com/DenysSepta">DenysSepta</a>. Open source under MIT.</p><div class="footer-links"><a href="https://github.com/DenysSepta/TVBacklightController">Repository</a><a href="https://github.com/DenysSepta/TVBacklightController/issues">Report an issue</a><a href="https://github.com/DenysSepta/TVBacklightController/blob/main/LICENSE">License</a></div></footer>
+</body>
+</html>
